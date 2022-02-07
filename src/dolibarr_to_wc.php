@@ -138,7 +138,3 @@ class DoliberrToWc
 	}
 }
 
-$DoliberrToWc = new DoliberrToWc('webservices', 'PPovCAG2uiaS');
-
-$Products = $DoliberrToWc->getProducts(['id' => 2]);
-echo json_encode($Products);
