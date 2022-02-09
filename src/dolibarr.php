@@ -1,24 +1,23 @@
 <?php
 
-require '../vendor/autoload.php';
+require dirname(__FILE__).'/../vendor/autoload.php';
 
 // if ( ! defined( 'ABSPATH' ) ) {
 //     exit( 'restricted access' );
 // }
 
-class DoliberrToWc 
+class doli_api 
 {
-    private $api_base_uri = 'http://localhost/dolibarr-14.0.5/htdocs/api/index.php';
+    private $api_base_uri = 'http://dolibarr.test/api/index.php';
     
     private $subscription_key;
 	private $username;
-	private $password;
 	private $token;
 	private $client;
 
-	public function __construct(String $username, String $password) {
+	public function __construct(String $username, String $subscription_key) {
 		$this->username = $username;
-		$this->password = $password;
+		$this->subscription_key = $subscription_key;
 
 		$this->client = new GuzzleHttp\Client();
 
@@ -29,6 +28,7 @@ class DoliberrToWc
 
 		$header = [
 	        'Accept' => 'application/json',
+	        'DOLAPIKEY' => $this->subscription_key,
 		];
 		
 		if ($withToken) {
@@ -43,6 +43,7 @@ class DoliberrToWc
 	}
 
     private function getAccessToken() {
+    	/*
 		$response = $this->post("/login", [
 			'form_params' => [
 		        'login' => $this->username, 
@@ -52,8 +53,8 @@ class DoliberrToWc
 		]);
 
 		$this->token = $response;
-
-		return $response->success->token;
+		*/
+		return $this->subscription_key;
 	}
 
     public function get($endpoint, $params) {
@@ -77,6 +78,7 @@ class DoliberrToWc
 		}
 
 		try {
+			$params["DOLAPIKEY"] = $this->subscription_key;
 			$response = $this->client->request($type, $endpoint, $params);
 			return (int)$response->getStatusCode() === 200 ? json_decode($response->getBody()) : null;
 		} catch (Exception $e) {
@@ -94,12 +96,12 @@ class DoliberrToWc
         $token = $this->token->success->token;
 
 		if (isset($params['id']) && !empty((int)$params['id'])) {
-			$ep = "/products/{$params['id']}?DOLAPIKEY=$token";
+			$ep = "/products/{$params['id']}";
 
 			return $this->get($ep, ["withToken"=>false]);
 		} 
 
-        $ep = "/products?DOLAPIKEY=$token";
+        $ep = "/products";
 
 		// if (isset($params['page']) && !empty((int)$params['page'])) {
 		// 	$query['page'] = (int)$params['page'];
@@ -118,12 +120,12 @@ class DoliberrToWc
         $token = $this->token->success->token;
 
 		if (isset($params['id']) && !empty((int)$params['id'])) {
-			$ep = "/categories/{$params['id']}?DOLAPIKEY=$token";
+			$ep = "/categories/{$params['id']}";
 
 			return $this->get($ep, ["withToken"=>false]);
 		} 
 
-        $ep = "/categories?DOLAPIKEY=$token";
+        $ep = "/categories";
 
 		// if (isset($params['page']) && !empty((int)$params['page'])) {
 		// 	$query['page'] = (int)$params['page'];
