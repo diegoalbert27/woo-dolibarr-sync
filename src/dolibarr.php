@@ -8,14 +8,16 @@ require dirname(__FILE__).'/../vendor/autoload.php';
 
 class doli_api 
 {
-    private $api_base_uri = 'http://dolibarr.test/api/index.php';
+    private $api_base_uri = '/api/index.php';
     
     private $subscription_key;
+	private $url_base;
 	private $username;
 	private $token;
 	private $client;
 
-	public function __construct(String $username, String $subscription_key) {
+	public function __construct(String $url_base, String $username, String $subscription_key) {
+		$this->url_base = $url_base;
 		$this->username = $username;
 		$this->subscription_key = $subscription_key;
 
@@ -58,11 +60,11 @@ class doli_api
 	}
 
     public function get($endpoint, $params) {
-		return $this->request('GET', $this->api_base_uri . $endpoint, $params);
+		return $this->request('GET', $this->url_base.$this->api_base_uri . $endpoint, $params);
 	}
 
     public function post($endpoint, $params) {
-		return $this->request('POST', $this->api_base_uri . $endpoint, $params);
+		return $this->request('POST', $this->url_base.$this->api_base_uri . $endpoint, $params);
 	}
 
     public function request($type, $endpoint, $params) {
