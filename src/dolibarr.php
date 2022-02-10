@@ -95,7 +95,6 @@ class doli_api
 
     public function getProducts(array $params = [])
 	{
-        $token = $this->token->success->token;
 
 		if (isset($params['id']) && !empty((int)$params['id'])) {
 			$ep = "/products/{$params['id']}";
@@ -113,13 +112,13 @@ class doli_api
 
 		return $this->get($ep, [
 			//'query' => $query,
-			"withToken" => false
+			"withToken" => false,
+			'verify' => false
 		]);
 	}
 
     public function getCategories(array $params = [])
 	{
-        $token = $this->token->success->token;
 
 		if (isset($params['id']) && !empty((int)$params['id'])) {
 			$ep = "/categories/{$params['id']}";
