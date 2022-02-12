@@ -98,21 +98,12 @@ class doli_api
     public function getProducts(array $params = []) {
         $token = $this->token->success->token;
 
+        $ep = "/products";
 		if (isset($params['id']) && !empty((int)$params['id'])) {
 			$ep = "/products/{$params['id']}";
-
-			return $this->get($ep, ["query"=>$params]);
 		} 
 
-        $ep = "/products";
-
-		// if (isset($params['page']) && !empty((int)$params['page'])) {
-		// 	$query['page'] = (int)$params['page'];
-		// } else {
-		// 	$query['page'] = 1;
-		// }
-
-		return $this->get($ep);
+		return $this->get($ep, ["query"=>$params]);
 	}
 
     public function getCategories(array $params = []) {
@@ -140,21 +131,12 @@ class doli_api
 	public function getOrders(array $params = []) {		
         $token = $this->token->success->token;
 
+        $ep = "/orders";
 		if (isset($params['id']) && !empty((int)$params['id'])) {
 			$ep = "/orders/{$params['id']}";
-
-			return $this->get($ep);
 		} 
 
-        $ep = "/orders";
-
-		// if (isset($params['page']) && !empty((int)$params['page'])) {
-		// 	$query['page'] = (int)$params['page'];
-		// } else {
-		// 	$query['page'] = 1;
-		// }
-
-		return $this->get($ep);
+		return $this->get($ep, ["query"=>$params]);
 	}
 
 	public function getCustomerByEmail(string $email) {
@@ -182,6 +164,13 @@ class doli_api
 		$orders = [];
 		foreach ($data as $j=>$order) {
 			$this->stats['processed'] = (int)$this->stats['processed']+1;
+
+			//check if order exists
+	        $doli_order = $this->getOrders([ "sqlfilters" => "(t.ref:=:'". $order->order_key ."')" ]);
+	        if ($doli_order) {
+				$this->stats['already_exists'] = (int)$this->stats['already_exists']+1;
+				continue;
+	        }
 
 			//prepare customer data
             $customer = [
@@ -256,4 +245,3 @@ class doli_api
 	}
 
 }
-

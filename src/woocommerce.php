@@ -21,7 +21,6 @@ class wc_api {
 		    [
 		        'wp_api' => true,
 		        'version' => 'wc/v3',
-				'verify_ssl' => false,
 		       // 'query_string_auth' => true
 		    ]
 		);
