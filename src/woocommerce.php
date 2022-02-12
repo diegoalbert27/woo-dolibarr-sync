@@ -302,12 +302,20 @@ class wc_api {
 			if (in_array($params['status'], ['any', 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed', 'trash'])) $query['status'] = $params['status'];
 		}
 
-		if (isset($params['before'])) {
-			//check or convert ISO8601 date 
-		}
+		date_default_timezone_set('Europe/Madrid');
 
-		if (isset($params['after'])) {
-			//check or convert ISO8601 date 
+		if ((isset($params['before']) || isset($params['after'])) && strtotime($params['after']) > strtotime($params['before'])) {
+			if (isset($params['before'])) {
+				//check or convert ISO8601 date 
+				$datetime = new DateTime(date('Y-m-d', strtotime($params['before'])));
+				$query['before'] = $datetime->format(DateTime::ATOM);
+			}
+
+			if (isset($params['after'])) {
+				//check or convert ISO8601 date 
+				$datetime = new DateTime(date('Y-m-d', strtotime($params['after'])));
+				$query['after'] = $datetime->format(DateTime::ATOM);
+			}
 		}
 
 		return $this->client->get( "orders", $query );

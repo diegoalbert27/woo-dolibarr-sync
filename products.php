@@ -1,10 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) .'/src/dolibarr.php';
-require_once dirname(__FILE__) .'/src/woocommerce.php';
-
-$doli_api = new doli_api('https://qukymodainfantil.woow.cat', 'yosiet', 'b1L2p2kVvFUhpbAsI1yWbG1135T70RsU');
-$wc_api = new wc_api('http://wordpress.test', 'ck_914f5b830a89ec006bcc1346eaf9f82cb5a5246f', 'cs_e1fc7001ddb2f28dd0272f88b125a778a6a05db1');
+require_once dirname(__FILE__) .'/bootstrap.php';
 
 $products = $doli_api->getProducts();
 $products_data = [];
