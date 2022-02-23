@@ -23,7 +23,9 @@ class doli_api
 		$this->username = $username;
 		$this->subscription_key = $subscription_key;
 
-		$this->client = new GuzzleHttp\Client();
+		$this->client = new GuzzleHttp\Client([
+			'verify' => false
+		]);
 
         $this->getAccessToken();
 	}
@@ -96,14 +98,76 @@ class doli_api
 	}
 
     public function getProducts(array $params = []) {
-        $token = $this->token->success->token;
-
         $ep = "/products";
 		if (isset($params['id']) && !empty((int)$params['id'])) {
 			$ep = "/products/{$params['id']}";
 		} 
 
 		return $this->get($ep, ["query"=>$params]);
+	}
+
+	public function getDocumentImageProduct(array $params = [])
+	{
+		$ep = "/documents";
+
+		$docProducts = $this->get($ep, ["query"=>$params]);
+
+		$docProducts = get_object_vars($docProducts);
+
+		$relativeDoc = "{$docProducts[0]->level1name}/{$docProducts[0]->relativename}";
+
+		if (!empty($relativeDoc)) {
+			$ep = '/documents/download';
+
+			$docImage = $this->get($ep, ["query"=>[
+				'modulepart' => 'product',
+				'original_file' => $relativeDoc
+			]]);
+
+			$docImage = get_object_vars($docImage);
+
+			$document = [
+				'filename' => $docImage['filename'],
+				'content' => $docImage['content'],
+				'level1name' => $docProducts[0]->level1name
+			];
+
+			return $document;
+		}
+	}
+
+	public static function delete_resources($path) 
+	{
+        if (is_dir($path)) {
+            $files = array_diff(scandir($path), array('.', '..'));
+
+            foreach ($files as $file) {
+                self::delete_resources(realpath($path) . '/' . $file);
+            }
+                
+            return rmdir($path);
+        }
+
+        if (is_file($path)) return unlink($path);
+
+        return false;
+	}
+
+	public static function download_doc (String $pathRelative, Array $doc = []) {
+		$path = mkdir($pathRelative, 0775, true);
+
+		if ($path && isset($doc['title']) && isset($doc['content'])) {
+			
+			$pathRelative = $pathRelative . '/' . $doc['title'];
+			
+			return file_put_contents($pathRelative, $doc['content']) ? true : false;
+		}
+
+		return false;
+	} 
+
+	public static function create_resources(String $path_base) {
+		return mkdir($path_base, 0775, true);
 	}
 
     public function getCategories(array $params = []) {
